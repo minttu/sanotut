@@ -1,0 +1,30 @@
+{% extends "template.html" %}
+{% block body %}
+    <div class="sticky" id="sticky">
+        <h1>Sanotut</h1>
+        <a href="/add">Lisää</a> -
+        <a onclick="to_top()">Ylös</a> -
+        <a onclick="to_bottom()">Alas</a> -
+        <a onclick="to_random()">Jonnekkin</a>
+    </div>
+    <div class="entries" id="entries">
+    {% for entry in entries %}
+        <div class="entry" id="{{ entry[0] }}">
+            <hr>
+            {% if entry[1] %}
+            <span class="time">{{ entry[1] }}</span>
+            {% endif %}
+            <!--<span> &#124; </span><span class="points">{{ entry[4] }}</span><span> points &#124; </span>
+
+            <span class="upvote" onclick="upvote({{ entry[0] }})">up</span>
+            <span>&#124;</span>
+            <span class="downvote" onclick="downvote({{ entry[0] }})">down</span>
+            -->
+            <pre>{{ entry[2]|safe }}</pre>
+        </div>
+    {% else %}
+        <pre>No entries</pre>
+    {% endfor %}
+    </div>
+    <script type="text/javascript" src="/static/sanotut.js"></script>    
+{% endblock %}
