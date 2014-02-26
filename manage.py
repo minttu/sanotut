@@ -54,7 +54,7 @@ def usercount():
         n = 0
         for v in va:
             n += v[4]
-            ng += n
+        ng += n
         ngl += len(va)
         print "%i: %s   \t%i votes with diff %i" % (u[0], u[1], len(va), n,)
     print "%i users with %i votes with diff %i" % (len(ua), ngl, ng)
