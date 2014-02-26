@@ -4,9 +4,10 @@
         <h1>Sanotut</h1>
         {% include "purkka.html" %}
         <a href="/">Uusimmat</a> -
-        <a href="/top">Parhaat</a>
+        <a href="/top">Parhaat</a> -
+        <a href="/bottom">Huonoimmat</a> -
+        <a href="/add">Lisää</a>
         <br>
-        <a href="/add">Lisää</a> -
         <a onclick="to_top()">Ylös</a> -
         <a onclick="to_bottom()">Alas</a> -
         <a onclick="to_random()">Jonnekin</a>
@@ -14,22 +15,24 @@
     <div class="entries" id="entries">
     {% for entry in entries %}
         <div class="entry" id="{{ entry[0] }}">
-            <hr>
-            {% if entry[1] %}
-            <span class="time">{{ entry[1] }}</span>
-            {% endif %}
-            <span> &#124; </span><span class="points">{{ entry[4] }}</span><span> pistettä &#124; </span>
+            <div class="posthead"><div class="postheadsec">
+                {% if entry[1] %}
+                    <span class="time">{{ entry[1].strftime('%d.%m.%Y') }}</span>
+                    <span> &#124; </span>
+                {% endif %}
 
-            <span class="upvote" onclick="upvote({{ entry[0] }})">++</span>
-            <span>&#124;</span>
-            <span class="downvote" onclick="downvote({{ entry[0] }})">--</span>
-            {% if entry[4] > -5 %}
-            <pre>{{ entry[2]|safe }}</pre>
-            {% else %}
-            <span>&#124;</span>
-            <span class="unhide" onclick="unhide({{ entry[0] }})">Näytä</span>
-            <pre class="hidden">{{ entry[2]|safe }}</pre>
-            {% endif %}
+                <span class="nappi upvote" onclick="upvote({{ entry[0] }})" title="Äänestä +">▲</span>
+                <span class="points">{{ entry[4] }}</span>
+                <span class="nappi downvote" onclick="downvote({{ entry[0] }})" title="Äänestä -">▼</span>
+
+                <span>&#124;</span>
+                {% if entry[4] <= -5 %}
+                    <span class="nappi" onclick="unhide(this, {{ entry[0] }})">Näytä</span>
+                {% else %}
+                    <span class="nappi" onclick="hide(this, {{ entry[0] }})">Piilota</span>
+                {% endif %}
+            </div></div>
+            <pre class="{{ 'hidden' if entry[4] <= -5 else '' }}">{{ entry[2]|safe }}</pre>
         </div>
     {% else %}
         <pre>No entries</pre>

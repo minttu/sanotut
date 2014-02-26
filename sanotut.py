@@ -76,6 +76,13 @@ def route_top():
     return render_template("index.html", entries=entries)
 
 
+@app.route('/bottom')
+def route_bottom():
+    c.execute("SELECT * FROM sanotut ORDER BY points ASC")
+    entries = c.fetchall()
+    return render_template("index.html", entries=entries)
+
+
 @app.route('/add')
 def route_add():
     return render_template("add.html")
@@ -160,8 +167,11 @@ def route_onlogin():
 def route_logout():
     uid = checksesval()
     if uid == None:
+        del session["sesval"]
+        del session["email"]
+        del session["logged_in"]
         flash(u"Olet jo kirjautunut ulos.")
-        return render_template("/")
+        return redirect("/")
     c.execute("UPDATE sanotut_users SET session = NULL WHERE id = (%s)",
              (uid,))
     del session["sesval"]
@@ -197,7 +207,15 @@ def route_vote():
         "SELECT * FROM sanotut_votes WHERE post_id=(%s) AND user_id=(%s)", (id, uid,))
     earlier = c.fetchone()
     if earlier != None:
-        return u"error: olet jo äänestänyt tuota", 400
+        if earlier[4] == amount:
+            return u"error: olet jo äänestänyt tuota", 400
+        c.execute(
+            "DELETE FROM sanotut_votes WHERE id=(%s)", (earlier[0],))
+        c.execute(
+            "UPDATE sanotut SET points=points+(%(amount)s) WHERE id=(%(id)s)",
+            {"amount": amount, "id": id})
+        db.commit()
+        return "success:%s:%i" % (meth, id), 200
 
     c.execute(
         "INSERT INTO sanotut_votes (time, user_id, post_id, diff) VALUES (%s, %s, %s, %s)",

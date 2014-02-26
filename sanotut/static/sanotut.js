@@ -6,14 +6,37 @@ window.$ = function(query) {
     return res;
 };
 
-function unhide(id) {
+if (!String.prototype.trim) {
+    String.prototype.trim = function () {
+        return this.replace(/^\s+|\s+$/g, '');
+    };
+}
+
+function toggleVisibility(id, on) {
     var el = document.getElementById(id);
     for(var i = 0; i < el.children.length; i++) {
         var cur = el.children[i];
-        if(cur.className === "hidden") {
-            cur.className = "";
+        if(cur.tagName === "PRE") {
+            if(on && cur.className.indexOf("hidden") !== -1) {
+                cur.className = cur.className.replace("hidden", "");
+                cur.className = cur.className.trim();
+            }else if(!on && cur.className.indexOf("hidden") === -1) {
+                cur.className += " hidden";
+            }
         }
     }
+}
+
+function unhide(self, id) {
+    self.innerHTML = "Piilota";
+    toggleVisibility(id, true);
+    self.onclick = function() { hide(self, id); };
+}
+
+function hide(self, id) {
+    self.innerHTML = "Näytä";
+    toggleVisibility(id, false);
+    self.onclick = function() { unhide(self, id); };
 }
 
 function to_random() {
@@ -47,14 +70,14 @@ window.onhashchange = function() {
 function change_votes(id, meth) {
     post("/onvote", meth+":"+id, function(data) {
         if(data.indexOf("error") !== -1) {
-            alert(data);
+            alert(data.replace("error", "virhe"));
         }else if(data.indexOf("success") !== -1) {
             var spl = data.split(":");
             var meth = spl[1];
             var id = spl[2];
-            var el = document.getElementById(id);
-            for(var i = 0; i < el.children.length; i++) {
-                var cur = el.children[i];
+            var el = document.getElementById(id).getElementsByTagName('*');
+            for(var i = 0; i < el.length; i++) {
+                var cur = el[i];
                 if(cur.className === "points") {
                     var value = parseInt(cur.innerHTML);
                     cur.innerHTML = value+(meth==="up"?1:-1);
