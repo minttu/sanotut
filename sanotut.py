@@ -80,7 +80,7 @@ def route_top():
 def route_bottom():
     c.execute("SELECT * FROM sanotut ORDER BY points ASC")
     entries = c.fetchall()
-    return render_template("index.html", entries=entries)
+    return render_template("index.html", entries=entries, nohide=True)
 
 
 @app.route('/add')

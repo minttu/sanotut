@@ -26,13 +26,13 @@
                 <span class="nappi downvote" onclick="downvote({{ entry[0] }})" title="Äänestä -">▼</span>
 
                 <span>&#124;</span>
-                {% if entry[4] <= -5 %}
+                {% if entry[4] <= -5 and not nohide %}
                     <span class="nappi" onclick="unhide(this, {{ entry[0] }})">Näytä</span>
                 {% else %}
                     <span class="nappi" onclick="hide(this, {{ entry[0] }})">Piilota</span>
                 {% endif %}
             </div></div>
-            <pre class="{{ 'hidden' if entry[4] <= -5 else '' }}">{{ entry[2]|safe }}</pre>
+            <pre class="{{ 'hidden' if entry[4] <= -5 and not nohide else '' }}">{{ entry[2]|safe }}</pre>
         </div>
     {% else %}
         <pre>No entries</pre>
