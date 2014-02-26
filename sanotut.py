@@ -67,7 +67,8 @@ def validemail(email):
 def route_index():
     c.execute("SELECT * FROM sanotut ORDER BY id DESC")
     entries = c.fetchall()
-    return BeautifulSoup(render_template("index.html", entries=entries)).prettify()
+    return render_template("index.html", entries=entries)
+    #return BeautifulSoup(render_template("index.html", entries=entries)).prettify()
 
 @app.route('/top')
 def route_top():
