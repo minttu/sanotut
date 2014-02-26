@@ -8,14 +8,13 @@ import re
 import pwd
 import string
 import random
+import time
 
 import config
 
-from bs4 import BeautifulSoup
-
 from passlib.apps import custom_app_context as pwd_context
 
-from flask import Flask, render_template, flash, redirect, request, abort, session
+from flask import Flask, render_template, flash, redirect, request, abort, session, g
 app = Flask(__name__, template_folder="sanotut/templates",
             static_folder="sanotut/static")
 app.config["SECRET_KEY"] = config.secret
@@ -68,13 +67,14 @@ def route_index():
     c.execute("SELECT * FROM sanotut ORDER BY id DESC")
     entries = c.fetchall()
     return render_template("index.html", entries=entries)
-    #return BeautifulSoup(render_template("index.html", entries=entries)).prettify()
+
 
 @app.route('/top')
 def route_top():
     c.execute("SELECT * FROM sanotut ORDER BY points DESC")
     entries = c.fetchall()
     return render_template("index.html", entries=entries)
+
 
 @app.route('/add')
 def route_add():
@@ -197,15 +197,11 @@ def route_vote():
         "SELECT * FROM sanotut_votes WHERE post_id=(%s) AND user_id=(%s)", (id, uid,))
     earlier = c.fetchone()
     if earlier != None:
-        #if earlier[4] == amount:
         return u"error: olet jo äänestänyt tuota", 400
-        #else:
-        #    c.execute(
-        #        "UPDATE sanotut_votes SET diff=(%s) WHERE id=(%s)", (amount, earlier[0],))
-    else:
-        c.execute(
-            "INSERT INTO sanotut_votes (time, user_id, post_id, diff) VALUES (%s, %s, %s, %s)",
-            (datetime.datetime.now(), uid, id, amount))
+
+    c.execute(
+        "INSERT INTO sanotut_votes (time, user_id, post_id, diff) VALUES (%s, %s, %s, %s)",
+        (datetime.datetime.now(), uid, id, amount))
 
     c.execute(
         "UPDATE sanotut SET points=points+(%(amount)s) WHERE id=(%(id)s)",
@@ -213,6 +209,22 @@ def route_vote():
     db.commit()
     return "success:%s:%i" % (meth, id), 200
 
+
+@app.before_request
+def before_request():
+    g.start = time.time()
+
+
+@app.after_request
+def after_request(response):
+    diff = time.time() - g.start
+    if (response.response):
+        if response.content_type.startswith("text/html;"):
+            if "__EXECUTION_TIME__" in response.response[0]:
+                response.response[0] = response.response[
+                    0].replace('__EXECUTION_TIME__', "{0:.4f}s".format(diff))
+                response.headers["content-length"] = len(response.response[0])
+    return response
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

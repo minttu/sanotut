@@ -9,6 +9,10 @@
 <body>
     <h1>Sanotut</h1>
     {% include "purkka.html" %}
+    <br>
     {% block body %}{% endblock %}
+    <div class="footer">
+        Tämän sivun generointi kesti __EXECUTION_TIME__.
+    </div>
 </body>
 </html>

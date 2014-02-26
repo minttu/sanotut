@@ -65,6 +65,10 @@ div.sticky {
     background-color: #660066;
 }
 
+div.footer {
+    font-size: 75%;
+}
+
 .upvote, .downvote, .unhide {
     cursor: pointer;
 }

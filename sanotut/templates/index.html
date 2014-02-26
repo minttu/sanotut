@@ -3,12 +3,10 @@
     <div class="sticky" id="sticky">
         <h1>Sanotut</h1>
         {% include "purkka.html" %}
-        <a href="/add">Lisää</a> -
-        {% if request.path != "/" %}
         <a href="/">Uusimmat</a> -
-        {% else %}
-        <a href="/top">Parhaat</a> -
-        {% endif %}
+        <a href="/top">Parhaat</a>
+        <br>
+        <a href="/add">Lisää</a> -
         <a onclick="to_top()">Ylös</a> -
         <a onclick="to_bottom()">Alas</a> -
         <a onclick="to_random()">Jonnekin</a>
