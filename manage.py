@@ -20,6 +20,14 @@ def main():
         initdb()
     elif "count" in sys.argv:
         count()
+    elif "usercount" in sys.argv:
+        usercount()
+    else:
+        print "./manage.py <command>"
+        print ""
+        print "  initdb          initialize MySQL"
+        print "  count           find anomalies in votes"
+        print "  usercount       list users"
 
 
 def count():
@@ -33,6 +41,23 @@ def count():
             n += v[4]
         if n != p[4]:
             print "%i: %i points =/= %i votes" % (p[0], p[4], n,)
+
+
+def usercount():
+    c.execute("SELECT * FROM sanotut_users")
+    ua = c.fetchall()
+    ng = 0
+    ngl = 0
+    for u in ua:
+        c.execute("SELECT * FROM sanotut_votes WHERE user_id=(%s)", (u[0],))
+        va = c.fetchall()
+        n = 0
+        for v in va:
+            n += v[4]
+            ng += n
+        ngl += len(va)
+        print "%i: %s   \t%i votes with diff %i" % (u[0], u[1], len(va), n,)
+    print "%i users with %i votes with diff %i" % (len(ua), ngl, ng)
 
 
 def initdb():
