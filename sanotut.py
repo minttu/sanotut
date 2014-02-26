@@ -55,7 +55,7 @@ def validemail(email):
         return False
     if config.realaccouts:
         try:
-            pwd.getpwnam(m.group(0))
+            pwd.getpwnam(m.group(1))
         except KeyError:
             return False
     return True
@@ -170,7 +170,7 @@ def route_vote():
 
     uid = checksesval()
     if uid == None:
-        return u"error: et ole kirjaantunut sisään", 400
+        return u"error: et ole kirjautunut sisään", 400
 
     spl = request.data.split(":")
     if len(spl) != 2:
@@ -189,11 +189,11 @@ def route_vote():
         "SELECT * FROM sanotut_votes WHERE post_id=(%s) AND user_id=(%s)", (id, uid,))
     earlier = c.fetchone()
     if earlier != None:
-        if earlier[4] == amount:
-            return u"error: olet jo äänestänyt tuota", 400
-        else:
-            c.execute(
-                "UPDATE sanotut_votes SET diff=(%s) WHERE id=(%s)", (amount, earlier[0],))
+        #if earlier[4] == amount:
+        return u"error: olet jo äänestänyt tuota", 400
+        #else:
+        #    c.execute(
+        #        "UPDATE sanotut_votes SET diff=(%s) WHERE id=(%s)", (amount, earlier[0],))
     else:
         c.execute(
             "INSERT INTO sanotut_votes (time, user_id, post_id, diff) VALUES (%s, %s, %s, %s)",

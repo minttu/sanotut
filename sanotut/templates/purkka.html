@@ -6,7 +6,7 @@
     {% endif %}
 {% endwith %}
 {% if session["logged_in"] %}
-    <span class="logged_in">Kirjaantuneena sisään {{ session["email"] }}</span>
+    <span class="logged_in">Olet kirjautuneena sisään {{ session["email"] }}</span>
     <a href="/logout">Kirjaudu ulos</a>
 {% else %}
     <a href="/register">Rekisteröidy</a> - <a href="/login">Kirjaudu sisään</a>

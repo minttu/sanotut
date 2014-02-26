@@ -20,7 +20,7 @@
             <span class="upvote" onclick="upvote({{ entry[0] }})">++</span>
             <span>&#124;</span>
             <span class="downvote" onclick="downvote({{ entry[0] }})">--</span>
-            {% if entry[4] >= -5 %}
+            {% if entry[4] > -5 %}
             <pre>{{ entry[2]|safe }}</pre>
             {% else %}
             <span>&#124;</span>
