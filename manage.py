@@ -18,6 +18,25 @@ c = db.cursor()
 def main():
     if "initdb" in sys.argv:
         initdb()
+    elif "count" in sys.argv:
+        count()
+
+
+def count():
+    c.execute("SELECT * FROM sanotut")
+    a1 = c.fetchall()
+    c.execute("SELECT * FROM sanotut_votes")
+    a2 = c.fetchall()
+
+    a1s = 0
+    a2s = 0
+
+    for a in a1:
+        a1s += a[4]
+    for a in a2:
+        a2s += a[4]
+
+    print "points: %i\nvotes: %i" % (a1s, a2s,)
 
 
 def initdb():
