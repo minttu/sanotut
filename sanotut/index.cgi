@@ -1,4 +1,4 @@
-#!../../venv/bin/python
+#!../venv/bin/python
 # encoding: utf-8
 
 import sys
