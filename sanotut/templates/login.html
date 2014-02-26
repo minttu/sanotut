@@ -1,0 +1,13 @@
+{% extends "template.html" %}
+{% block body %}
+    <a href="/">Takaisin</a><br>
+    <br>
+
+    <p>Pääset äänestämään sanottuja vain jos kirjaannut sisään.</p>
+
+    <form action="/onlogin" method="POST">
+        <input type="text" placeholder="email" id="email" name="email"><br>
+        <input type="password" placeholder="password" id="password" name="password"><br>
+        <input type="submit" value="Kirjaudu">
+    </form>
+{% endblock %}

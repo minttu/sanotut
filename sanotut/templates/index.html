@@ -2,6 +2,7 @@
 {% block body %}
     <div class="sticky" id="sticky">
         <h1>Sanotut</h1>
+        {% include "purkka.html" %}
         <a href="/add">Lisää</a> -
         <a onclick="to_top()">Ylös</a> -
         <a onclick="to_bottom()">Alas</a> -
@@ -14,17 +15,22 @@
             {% if entry[1] %}
             <span class="time">{{ entry[1] }}</span>
             {% endif %}
-            <!--<span> &#124; </span><span class="points">{{ entry[4] }}</span><span> points &#124; </span>
+            <span> &#124; </span><span class="points">{{ entry[4] }}</span><span> pistettä &#124; </span>
 
-            <span class="upvote" onclick="upvote({{ entry[0] }})">up</span>
+            <span class="upvote" onclick="upvote({{ entry[0] }})">++</span>
             <span>&#124;</span>
-            <span class="downvote" onclick="downvote({{ entry[0] }})">down</span>
-            -->
+            <span class="downvote" onclick="downvote({{ entry[0] }})">--</span>
+            {% if entry[4] >= -5 %}
             <pre>{{ entry[2]|safe }}</pre>
+            {% else %}
+            <span>&#124;</span>
+            <span class="unhide" onclick="unhide({{ entry[0] }})">Näytä</span>
+            <pre class="hidden">{{ entry[2]|safe }}</pre>
+            {% endif %}
         </div>
     {% else %}
         <pre>No entries</pre>
     {% endfor %}
     </div>
-    <script type="text/javascript" src="/static/sanotut.js"></script>    
+    <script type="text/javascript" src="/static/sanotut.js"></script>
 {% endblock %}

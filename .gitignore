@@ -3,3 +3,4 @@ sanotut/.htaccess
 config.py
 *.pyc
 *.swp
+venv/*

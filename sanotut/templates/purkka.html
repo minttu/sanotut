@@ -1,0 +1,14 @@
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <span class="flash">{{ message }}</span><br>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+{% if session["logged_in"] %}
+    <span class="logged_in">Kirjaantuneena sisään {{ session["email"] }}</span>
+    <a href="/logout">Kirjaudu ulos</a>
+{% else %}
+    <a href="/register">Rekisteröidy</a> - <a href="/login">Kirjaudu sisään</a>
+{% endif %}
+<br>

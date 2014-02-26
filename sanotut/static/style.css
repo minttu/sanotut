@@ -65,7 +65,7 @@ div.sticky {
     background-color: #660066;
 }
 
-.upvote, .downvote {
+.upvote, .downvote, .unhide {
     cursor: pointer;
 }
 
@@ -77,6 +77,9 @@ div.sticky {
     color: #f8f8f8;
 }
 
+.hidden {
+    display: none;
+}
 
 @media (max-width: 992px) {
     body {
