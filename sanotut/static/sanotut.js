@@ -1,3 +1,11 @@
+window.$ = function(query) {
+    var res =  document.querySelectorAll(query);
+    if(res.length == 1) {
+        return res[0];
+    }
+    return res;
+};
+
 function unhide(id) {
     var el = document.getElementById(id);
     for(var i = 0; i < el.children.length; i++) {
@@ -9,7 +17,7 @@ function unhide(id) {
 }
 
 function to_random() {
-    var all = document.getElementById("entries");
+    var all = $(".entries");
     var randel = all.children[Math.floor(Math.random()*all.children.length)];
     window.location.hash = "#"+randel.id;
 }
@@ -25,8 +33,8 @@ function to_bottom() {
 }
 
 function on_hash_change() {
-    try {
-        window.scrollBy(0,-document.getElementById("sticky").offsetHeight-5);
+    try {
+        window.scrollBy(0,-$("#sticky").offsetHeight-5);
     } catch (err) {
 
     }

@@ -11,6 +11,8 @@ import random
 
 import config
 
+from bs4 import BeautifulSoup
+
 from passlib.apps import custom_app_context as pwd_context
 
 from flask import Flask, render_template, flash, redirect, request, abort, session
@@ -65,7 +67,7 @@ def validemail(email):
 def route_index():
     c.execute("SELECT * FROM sanotut ORDER BY id DESC")
     entries = c.fetchall()
-    return render_template("index.html", entries=entries)
+    return BeautifulSoup(render_template("index.html", entries=entries)).prettify()
 
 @app.route('/top')
 def route_top():
