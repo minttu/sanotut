@@ -63,10 +63,15 @@ def validemail(email):
 
 @app.route('/')
 def route_index():
-    c.execute(("SELECT * FROM sanotut ORDER BY id DESC"))
+    c.execute("SELECT * FROM sanotut ORDER BY id DESC")
     entries = c.fetchall()
     return render_template("index.html", entries=entries)
 
+@app.route('/top')
+def route_top():
+    c.execute("SELECT * FROM sanotut ORDER BY points DESC")
+    entries = c.fetchall()
+    return render_template("index.html", entries=entries)
 
 @app.route('/add')
 def route_add():
