@@ -24,19 +24,15 @@ def main():
 
 def count():
     c.execute("SELECT * FROM sanotut")
-    a1 = c.fetchall()
-    c.execute("SELECT * FROM sanotut_votes")
-    a2 = c.fetchall()
-
-    a1s = 0
-    a2s = 0
-
-    for a in a1:
-        a1s += a[4]
-    for a in a2:
-        a2s += a[4]
-
-    print "points: %i\nvotes: %i" % (a1s, a2s,)
+    pa = c.fetchall()
+    for p in pa:
+        c.execute("SELECT * FROM sanotut_votes WHERE post_id=(%s)", (p[0],))
+        va = c.fetchall()
+        n = 0
+        for v in va:
+            n += v[4]
+        if n != p[4]:
+            print "%i: %i points =/= %i votes" % (p[0], p[4], n,)
 
 
 def initdb():
