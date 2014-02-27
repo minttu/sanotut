@@ -93,11 +93,11 @@ div.footer {
     font-family: monospace;
 }
 
-.upvote {
-    color: lightgreen;
+.upvote.voted, .upvote:hover {
+    color: limegreen;
 }
 
-.downvote {
+.downvote.voted, .downvote:hover {
     color: deeppink;
 }
 

@@ -21,9 +21,9 @@
                     <span> &#124; </span>
                 {% endif %}
 
-                <span class="nappi upvote" onclick="upvote({{ entry[0] }})" title="Äänestä +">▲</span>
+                <span class="nappi upvote {{ 'voted' if hasvoted(entry[0], voted, 1) else ''}}" onclick="upvote({{ entry[0] }})" title="Äänestä +">▲</span>
                 <span class="points">{{ entry[4] }}</span>
-                <span class="nappi downvote" onclick="downvote({{ entry[0] }})" title="Äänestä -">▼</span>
+                <span class="nappi downvote {{ 'voted' if hasvoted(entry[0], voted, -1) else ''}}" onclick="downvote({{ entry[0] }})" title="Äänestä -">▼</span>
 
                 <span>&#124;</span>
                 {% if entry[4] <= -5 and not nohide %}

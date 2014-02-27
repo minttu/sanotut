@@ -66,21 +66,36 @@ def validemail(email):
 def route_index():
     c.execute("SELECT * FROM sanotut ORDER BY id DESC")
     entries = c.fetchall()
-    return render_template("index.html", entries=entries)
+    uid = checksesval()
+    voted = []
+    if uid != None:
+        c.execute("SELECT * FROM sanotut_votes WHERE user_id=(%s)", (uid,))
+        voted = [(row[3], row[4]) for row in c.fetchall()]
+    return render_template("index.html", entries=entries, voted=voted)
 
 
 @app.route('/top')
 def route_top():
     c.execute("SELECT * FROM sanotut ORDER BY points DESC")
     entries = c.fetchall()
-    return render_template("index.html", entries=entries)
+    uid = checksesval()
+    voted = []
+    if uid != None:
+        c.execute("SELECT * FROM sanotut_votes WHERE user_id=(%s)", (uid,))
+        voted = [(row[3], row[4]) for row in c.fetchall()]
+    return render_template("index.html", entries=entries, voted=voted)
 
 
 @app.route('/bottom')
 def route_bottom():
     c.execute("SELECT * FROM sanotut ORDER BY points ASC")
     entries = c.fetchall()
-    return render_template("index.html", entries=entries, nohide=True)
+    uid = checksesval()
+    voted = []
+    if uid != None:
+        c.execute("SELECT * FROM sanotut_votes WHERE user_id=(%s)", (uid,))
+        voted = [(row[3], row[4]) for row in c.fetchall()]
+    return render_template("index.html", entries=entries, nohide=True, voted=voted)
 
 
 @app.route('/add')
@@ -243,6 +258,16 @@ def after_request(response):
                     0].replace('__EXECUTION_TIME__', "{0:.4f}s".format(diff))
                 response.headers["content-length"] = len(response.response[0])
     return response
+
+
+@app.context_processor
+def utility_processor():
+    def hasvoted(val, arr, diff):
+        for i in arr:
+            if val == i[0] and diff == i[1]:
+                return True
+        return False
+    return dict(hasvoted=hasvoted)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

@@ -76,11 +76,27 @@ function change_votes(id, meth) {
             var meth = spl[1];
             var id = spl[2];
             var el = document.getElementById(id).getElementsByTagName('*');
+            var res = false;
             for(var i = 0; i < el.length; i++) {
                 var cur = el[i];
                 if(cur.className === "points") {
                     var value = parseInt(cur.innerHTML);
                     cur.innerHTML = value+(meth==="up"?1:-1);
+                }
+                if(cur.className.indexOf("voted") !== -1) {
+                    cur.className = cur.className.replace("voted", "");
+                    cur.className = cur.className.trim();
+                    res = true;
+                }
+            }
+            if(res===false) {
+                for(var i = 0; i < el.length; i++) {
+                    var cur = el[i];
+                    if(meth==="up" && cur.className.indexOf("upvote") !== -1) {
+                        cur.className += " voted";
+                    }else if(meth==="down" && cur.className.indexOf("downvote") !== -1) {
+                        cur.className += " voted";
+                    }
                 }
             }
         }
