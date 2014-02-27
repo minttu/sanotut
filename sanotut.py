@@ -1,6 +1,7 @@
 #!venv/bin/python
 # coding: utf-8
 
+# standard
 import sys
 sys.dont_write_bytecode = True
 import os
@@ -9,37 +10,37 @@ import pwd
 import string
 import random
 import time
+import datetime
 
+# our
 import config
 
+# packages
 from passlib.apps import custom_app_context as pwd_context
+from flask import (Flask, render_template, flash, redirect, request, abort,
+                   session, g)
+import mysql.connector
 
-from flask import Flask, render_template, flash, redirect, request, abort, session, g
-app = Flask(__name__, template_folder="sanotut/templates",
+# globals
+app = Flask(__name__,
+            template_folder="sanotut/templates",
             static_folder="sanotut/static")
 app.config["SECRET_KEY"] = config.secret
 
-import mysql.connector
 db = mysql.connector.connect(password=config.password,
                              user=config.user,
                              host=config.host,
                              database=config.database,
                              buffered=True)
-
 c = db.cursor()
-
-import datetime
 
 
 def checksesval():
-    if "sesval" not in session:
+    if "sesval" not in session or "email" not in session or "logged_in" not in session:
         return None
-    if "email" not in session:
-        return None
-    if "logged_in" not in session:
-        return None
-    c.execute(
-        "SELECT * FROM sanotut_users WHERE session = (%s) AND email = (%s)", (session["sesval"], session["email"],))
+    c.execute(("SELECT * FROM sanotut_users "
+               "WHERE session = (%s) AND email = (%s)"),
+             (session["sesval"], session["email"],))
     res = c.fetchone()
     if res == None:
         return None
@@ -62,8 +63,20 @@ def validemail(email):
     return True
 
 
+def checklogout():
+    uid = checksesval()
+    if uid == None:
+        if "sesval" in session:
+            del session["sesval"]
+        if "email" in session:
+            del session["email"]
+        if "logged_in" in session:
+            del session["logged_in"]
+
+
 @app.route('/')
 def route_index():
+    checklogout()
     sort = request.args.get('sort', '')
     if sort == "best":
         c.execute("SELECT * FROM sanotut ORDER BY points DESC")
@@ -85,15 +98,17 @@ def route_index():
 
 @app.route('/add', methods=['GET', 'POST'])
 def route_add():
+    checklogout()
     if request.method == 'POST':
         if "sanottu" not in request.form:
             abort(400)
-        c.execute(("INSERT INTO sanotut"
-                   "(message, computer, time)"
-                   "VALUES (%(message)s, %(computer)s, %(time)s)"),
-                  {"message": request.form["sanottu"].replace("<", "&lt;").replace(">", "&gt;"),
-                   "computer": request.remote_addr,
-                   "time": datetime.datetime.now()})
+        c.execute(("INSERT INTO sanotut "
+                   "(message, computer, time) "
+                   "VALUES (%s, %s, %s)"),
+                  (request.form[
+                      "sanottu"].replace("<", "&lt;").replace(">", "&gt;"),
+                   request.remote_addr,
+                   datetime.datetime.now()))
         db.commit()
         return redirect("/")
     return render_template("add.html")
@@ -101,6 +116,7 @@ def route_add():
 
 @app.route('/register', methods=['GET', 'POST'])
 def route_register():
+    checklogout()
     if request.method == 'POST':
         if "email" not in request.form or not validemail(request.form["email"]):
             flash(u"Sähköposti ei vastaa vaadittua kaavaa!")
@@ -111,9 +127,9 @@ def route_register():
         hash = pwd_context.encrypt(request.form["password"])
 
         try:
-            c.execute("""INSERT INTO sanotut_users
-                         (email, password)
-                         VALUES (%s, %s)""",
+            c.execute(("INSERT INTO sanotut_users "
+                       "(email, password) "
+                       "VALUES (%s, %s)"),
                      (request.form["email"], hash,))
         except Exception:
             flash(u"Tuo sposti on rekisteröity jo!")
@@ -128,12 +144,14 @@ def route_register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def route_login():
+    checklogout()
     if request.method == 'POST':
         if "email" not in request.form or "password" not in request.form:
             flash(u"Anna sposti ja salasana.")
             return redirect("/login")
-        c.execute("""   SELECT * FROM sanotut_users
-                        WHERE email = (%s)""", (request.form["email"],))
+        c.execute(("SELECT * FROM sanotut_users "
+                   "WHERE email = (%s)"),
+                 (request.form["email"],))
         res = c.fetchone()
         if res == None or not pwd_context.verify(request.form["password"], res[2]):
             flash(u"Ei moista sposti/salasana paria!")
@@ -194,33 +212,33 @@ def route_vote():
     else:
         return "error: unkown method", 400
 
-    c.execute(
-        "SELECT * FROM sanotut_votes WHERE post_id=(%s) AND user_id=(%s)", (id, uid,))
+    c.execute(("SELECT * FROM sanotut_votes "
+               "WHERE post_id=(%s) AND user_id=(%s)"), (id, uid,))
     earlier = c.fetchone()
     if earlier != None:
         if earlier[4] == amount:
             return u"error: olet jo äänestänyt tuota", 400
-        c.execute(
-            "DELETE FROM sanotut_votes WHERE id=(%s)", (earlier[0],))
-        c.execute(
-            "UPDATE sanotut SET points=points+(%(amount)s) WHERE id=(%(id)s)",
-            {"amount": amount, "id": id})
+        c.execute(("DELETE FROM sanotut_votes "
+                   "WHERE id=(%s)"), (earlier[0],))
+        c.execute(("UPDATE sanotut "
+                   "SET points=points+(%(amount)s) WHERE id=(%(id)s)"),
+                  {"amount": amount, "id": id})
         db.commit()
         return "success:%s:%i" % (meth, id), 200
 
-    c.execute(
-        "INSERT INTO sanotut_votes (time, user_id, post_id, diff) VALUES (%s, %s, %s, %s)",
-        (datetime.datetime.now(), uid, id, amount))
-
-    c.execute(
-        "UPDATE sanotut SET points=points+(%(amount)s) WHERE id=(%(id)s)",
-        {"amount": amount, "id": id})
+    c.execute(("INSERT INTO sanotut_votes "
+               "(time, user_id, post_id, diff) VALUES (%s, %s, %s, %s)"),
+             (datetime.datetime.now(), uid, id, amount))
+    c.execute(("UPDATE sanotut "
+               "SET points=points+(%(amount)s) WHERE id=(%(id)s)"),
+              {"amount": amount, "id": id})
     db.commit()
     return "success:%s:%i" % (meth, id), 200
 
 
 @app.route('/stats')
 def route_stats():
+    checklogout()
     data = {}
     c.execute("SELECT COUNT(*) FROM sanotut")
     data["posts"] = c.fetchone()[0]
