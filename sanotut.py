@@ -64,118 +64,94 @@ def validemail(email):
 
 @app.route('/')
 def route_index():
-    c.execute("SELECT * FROM sanotut ORDER BY id DESC")
+    sort = request.args.get('sort', '')
+    if sort == "best":
+        c.execute("SELECT * FROM sanotut ORDER BY points DESC")
+    elif sort == "worst":
+        c.execute("SELECT * FROM sanotut ORDER BY points ASC")
+    else:
+        c.execute("SELECT * FROM sanotut ORDER BY id DESC")
     entries = c.fetchall()
     uid = checksesval()
     voted = []
     if uid != None:
         c.execute("SELECT * FROM sanotut_votes WHERE user_id=(%s)", (uid,))
         voted = [(row[3], row[4]) for row in c.fetchall()]
-    return render_template("index.html", entries=entries, voted=voted)
+    return render_template("index.html",
+                           entries=entries,
+                           voted=voted,
+                           nohide=(True if sort == "worst" else False))
 
 
-@app.route('/top')
-def route_top():
-    c.execute("SELECT * FROM sanotut ORDER BY points DESC")
-    entries = c.fetchall()
-    uid = checksesval()
-    voted = []
-    if uid != None:
-        c.execute("SELECT * FROM sanotut_votes WHERE user_id=(%s)", (uid,))
-        voted = [(row[3], row[4]) for row in c.fetchall()]
-    return render_template("index.html", entries=entries, voted=voted)
-
-
-@app.route('/bottom')
-def route_bottom():
-    c.execute("SELECT * FROM sanotut ORDER BY points ASC")
-    entries = c.fetchall()
-    uid = checksesval()
-    voted = []
-    if uid != None:
-        c.execute("SELECT * FROM sanotut_votes WHERE user_id=(%s)", (uid,))
-        voted = [(row[3], row[4]) for row in c.fetchall()]
-    return render_template("index.html", entries=entries, nohide=True, voted=voted)
-
-
-@app.route('/add')
+@app.route('/add', methods=['GET', 'POST'])
 def route_add():
+    if request.method == 'POST':
+        if "sanottu" not in request.form:
+            abort(400)
+        c.execute(("INSERT INTO sanotut"
+                   "(message, computer, time)"
+                   "VALUES (%(message)s, %(computer)s, %(time)s)"),
+                  {"message": request.form["sanottu"].replace("<", "&lt;").replace(">", "&gt;"),
+                   "computer": request.remote_addr,
+                   "time": datetime.datetime.now()})
+        db.commit()
+        return redirect("/")
     return render_template("add.html")
 
 
-@app.route('/onadd', methods=['POST'])
-def route_onadd():
-    if "sanottu" not in request.form:
-        abort(400)
-    c.execute(("INSERT INTO sanotut"
-               "(message, computer, time)"
-               "VALUES (%(message)s, %(computer)s, %(time)s)"),
-              {"message": request.form["sanottu"].replace("<", "&lt;").replace(">", "&gt;"),
-               "computer": request.remote_addr,
-               "time": datetime.datetime.now()})
-    db.commit()
-    return redirect("/")
-
-
-@app.route('/register')
+@app.route('/register', methods=['GET', 'POST'])
 def route_register():
+    if request.method == 'POST':
+        if "email" not in request.form or not validemail(request.form["email"]):
+            flash(u"Sähköposti ei vastaa vaadittua kaavaa!")
+            return redirect("/register")
+        if "password" not in request.form or len(request.form["password"]) < 6:
+            flash(u"Salasanasi tulee olla yli viisi merkkiä!")
+            return redirect("/register")
+        hash = pwd_context.encrypt(request.form["password"])
+
+        try:
+            c.execute("""INSERT INTO sanotut_users
+                         (email, password)
+                         VALUES (%s, %s)""",
+                     (request.form["email"], hash,))
+        except Exception:
+            flash(u"Tuo sposti on rekisteröity jo!")
+            return redirect("/register")
+
+        db.commit()
+
+        flash(u"Voit nyt kirjautua sisään!")
+        return redirect("/login")
     return render_template("register.html")
 
 
-@app.route('/onregister', methods=['POST'])
-def route_onregister():
-    if "email" not in request.form or not validemail(request.form["email"]):
-        flash(u"Sähköposti ei vastaa vaadittua kaavaa!")
-        return redirect("/register")
-    if "password" not in request.form or len(request.form["password"]) < 6:
-        flash(u"Salasanasi tulee olla yli viisi merkkiä!")
-        return redirect("/register")
-    hash = pwd_context.encrypt(request.form["password"])
-
-    try:
-        c.execute("""INSERT INTO sanotut_users
-                     (email, password)
-                     VALUES (%s, %s)""",
-                 (request.form["email"], hash,))
-    except Exception:
-        flash(u"Tuo sposti on rekisteröity jo!")
-        return redirect("/register")
-
-    db.commit()
-
-    flash(u"Voit nyt kirjautua sisään!")
-    return redirect("/login")
-
-
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def route_login():
+    if request.method == 'POST':
+        if "email" not in request.form or "password" not in request.form:
+            flash(u"Anna sposti ja salasana.")
+            return redirect("/login")
+        c.execute("""   SELECT * FROM sanotut_users
+                        WHERE email = (%s)""", (request.form["email"],))
+        res = c.fetchone()
+        if res == None or not pwd_context.verify(request.form["password"], res[2]):
+            flash(u"Ei moista sposti/salasana paria!")
+            return redirect("/login")
+        allchoice = string.lowercase + string.uppercase + string.digits
+        sesval = ''.join(random.choice(allchoice) for i in range(64))
+
+        c.execute("UPDATE sanotut_users SET session = (%s) WHERE id = (%s)",
+                 (sesval, res[0],))
+        db.commit()
+
+        session["sesval"] = sesval
+        session["email"] = request.form["email"]
+        session["logged_in"] = True
+
+        flash(u"Kirjauduit sisään.")
+        return redirect("/")
     return render_template("login.html")
-
-
-@app.route('/onlogin', methods=['POST'])
-def route_onlogin():
-    if "email" not in request.form or "password" not in request.form:
-        flash(u"Anna sposti ja salasana.")
-        return redirect("/login")
-    c.execute("""   SELECT * FROM sanotut_users
-                    WHERE email = (%s)""", (request.form["email"],))
-    res = c.fetchone()
-    if res == None or not pwd_context.verify(request.form["password"], res[2]):
-        flash(u"Ei moista sposti/salasana paria!")
-        return redirect("/login")
-    allchoice = string.lowercase + string.uppercase + string.digits
-    sesval = ''.join(random.choice(allchoice) for i in range(64))
-
-    c.execute("UPDATE sanotut_users SET session = (%s) WHERE id = (%s)",
-             (sesval, res[0],))
-    db.commit()
-
-    session["sesval"] = sesval
-    session["email"] = request.form["email"]
-    session["logged_in"] = True
-
-    flash(u"Kirjauduit sisään.")
-    return redirect("/")
 
 
 @app.route('/logout')
@@ -196,7 +172,7 @@ def route_logout():
     return redirect("/")
 
 
-@app.route('/onvote', methods=['POST'])
+@app.route('/vote', methods=['POST'])
 def route_vote():
     if request.data == None:
         abort(400)

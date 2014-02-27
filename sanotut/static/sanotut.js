@@ -68,7 +68,7 @@ window.onhashchange = function() {
 };
 
 function change_votes(id, meth) {
-    post("/onvote", meth+":"+id, function(data) {
+    post("/vote", meth+":"+id, function(data) {
         if(data.indexOf("error") !== -1) {
             alert(data.replace("error", "virhe"));
         }else if(data.indexOf("success") !== -1) {
@@ -114,7 +114,7 @@ function post(url, data, cb) {
     var httpRequest = new XMLHttpRequest();
 
     if (!httpRequest) {
-      return false;
+        return false;
     }
 
     httpRequest.onreadystatechange = function() {
