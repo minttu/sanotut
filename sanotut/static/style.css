@@ -1,4 +1,4 @@
-.downvote.voted, .downvote: hover {
+.downvote.voted, .downvote:hover {
     color: #FF1493;
 }
 
@@ -27,7 +27,7 @@
     font-weight: bolder;
 }
 
-.upvote.voted, .upvote: hover {
+.upvote.voted, .upvote:hover {
     color: #32CD32;
 }
 
