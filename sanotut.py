@@ -219,6 +219,23 @@ def route_vote():
     return "success:%s:%i" % (meth, id), 200
 
 
+@app.route('/stats')
+def route_stats():
+    data = {}
+    c.execute("SELECT COUNT(*) FROM sanotut")
+    data["posts"] = c.fetchone()[0]
+    c.execute("SELECT COUNT(*) FROM sanotut_votes")
+    data["votes"] = c.fetchone()[0]
+    c.execute("SELECT COUNT(*) FROM sanotut_users")
+    data["users"] = c.fetchone()[0]
+    c.execute("SELECT * FROM sanotut_votes")
+    arr = c.fetchall()
+    data["diff"] = 0
+    for i in arr:
+        data["diff"] += i[4]
+    return render_template("stats.html", data=data)
+
+
 @app.before_request
 def before_request():
     g.start = time.time()

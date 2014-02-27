@@ -1,4 +1,24 @@
-window.$ = function(query) {
+// sanotut.js
+// ==========
+
+// minilib
+// -------
+
+// Polyfill for trim
+if (!String.prototype.trim) {
+    String.prototype.trim = function () {
+        return this.replace(/^\s+|\s+$/g, '');
+    };
+}
+
+if (!String.prototype.contains) {
+    String.prototype.contains = function(it) {
+        return this.indexOf(it) != -1;
+    };
+}
+
+// Shortcut for querySelectorAll
+function $(query) {
     var res =  document.querySelectorAll(query);
     if(res.length == 1) {
         return res[0];
@@ -6,23 +26,41 @@ window.$ = function(query) {
     return res;
 };
 
-if (!String.prototype.trim) {
-    String.prototype.trim = function () {
-        return this.replace(/^\s+|\s+$/g, '');
+// AJAX Post
+function post(url, data, cb) {
+    var httpRequest = new XMLHttpRequest();
+    if (!httpRequest) {
+        return false;
+    }
+    httpRequest.onreadystatechange = function() {
+        if (httpRequest.readyState === 4) {
+            if (httpRequest.status === 200 || httpRequest.status === 400) {
+                cb(httpRequest.responseText);
+            }
+        }
     };
+    httpRequest.open('POST', url, true);
+    httpRequest.send(data);
 }
 
+// Class toggling
+function toggleClass(element, cls, on) {
+    if(on && element.className.contains(cls)) {
+        element.className = element.className.replace(cls, "").trim();
+    }else if(!on && !element.className.contains(cls)) {
+        element.className += " "+cls;
+    }
+}
+
+// sanotut
+// -------
+
 function toggleVisibility(id, on) {
-    var el = document.getElementById(id);
+    var el = document.getElementById(id); // $ does not work
     for(var i = 0; i < el.children.length; i++) {
         var cur = el.children[i];
         if(cur.tagName === "PRE") {
-            if(on && cur.className.indexOf("hidden") !== -1) {
-                cur.className = cur.className.replace("hidden", "");
-                cur.className = cur.className.trim();
-            }else if(!on && cur.className.indexOf("hidden") === -1) {
-                cur.className += " hidden";
-            }
+            toggleClass(cur, "hidden", on);
         }
     }
 }
@@ -56,16 +94,14 @@ function to_bottom() {
 }
 
 function on_hash_change() {
-    try {
-        window.scrollBy(0,-$("#sticky").offsetHeight-5);
-    } catch (err) {
+    //try {
+        window.scrollBy(0,-$("#sticky").offsetHeight);
+    //} catch (err) {
 
-    }
+    //}
 }
 
-window.onhashchange = function() {
-    on_hash_change();
-};
+window.onhashchange = on_hash_change;
 
 function change_votes(id, meth) {
     post("/vote", meth+":"+id, function(data) {
@@ -108,23 +144,4 @@ function upvote(id) {
 }
 function downvote(id) {
     change_votes(id, "down");
-}
-
-function post(url, data, cb) {
-    var httpRequest = new XMLHttpRequest();
-
-    if (!httpRequest) {
-        return false;
-    }
-
-    httpRequest.onreadystatechange = function() {
-        if (httpRequest.readyState === 4) {
-            if (httpRequest.status === 200 || httpRequest.status === 400) {
-                cb(httpRequest.responseText);
-            }
-        }
-    };
-
-    httpRequest.open('POST', url, true);
-    httpRequest.send(data);
 }

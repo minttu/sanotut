@@ -1,31 +1,19 @@
 {% extends "template.html" %}
 {% block body %}
-    <div class="sticky" id="sticky">
-        <h1>Sanotut</h1>
-        {% include "purkka.html" %}
-        <a href="/">Uusimmat</a> -
-        <a href="/?sort=best">Parhaat</a> -
-        <a href="/?sort=worst">Huonoimmat</a> -
-        <a href="/add">Lisää</a>
-        <br>
-        <a onclick="to_top()">Ylös</a> -
-        <a onclick="to_bottom()">Alas</a> -
-        <a onclick="to_random()">Jonnekin</a>
-    </div>
     <div class="entries" id="entries">
     {% for entry in entries %}
         <div class="entry" id="{{ entry[0] }}">
             <div class="posthead"><div class="postheadsec">
                 {% if entry[1] %}
                     <span class="time">{{ entry[1].strftime('%d.%m.%Y') }}</span>
-                    <span> &#124; </span>
+                    <span>│</span>
                 {% endif %}
 
                 <span class="nappi upvote {{ 'voted' if hasvoted(entry[0], voted, 1) else ''}}" onclick="upvote({{ entry[0] }})" title="Äänestä +">▲</span>
                 <span class="points">{{ entry[4] }}</span>
                 <span class="nappi downvote {{ 'voted' if hasvoted(entry[0], voted, -1) else ''}}" onclick="downvote({{ entry[0] }})" title="Äänestä -">▼</span>
 
-                <span>&#124;</span>
+                <span>│</span>
                 {% if entry[4] <= -5 and not nohide %}
                     <span class="nappi" onclick="unhide(this, {{ entry[0] }})">Näytä</span>
                 {% else %}

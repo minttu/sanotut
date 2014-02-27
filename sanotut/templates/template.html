@@ -4,13 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Sanotut</title>
+    <link rel="stylesheet" type="text/css" href="/static/normalize.css">
     <link rel="stylesheet" type="text/css" href="/static/style.css">
     <link rel="shortcut icon" href="/static/favicon.ico">
 </head>
 <body>
-    <h1>Sanotut</h1>
-    {% include "purkka.html" %}
-    <br>
+    <br><br><br><br><br><br><br><br> <!-- very beautiful -->
+    <div class="sticky" id="sticky">
+        <h1>Sanotut</h1>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <span class="flash">{{ message }}</span><br>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+        {% if session["logged_in"] %}
+            <span class="logged_in">Olet kirjautuneena sisään {{ session["email"] }}</span>
+            <a href="/logout">Kirjaudu ulos</a>
+        {% else %}
+            <a href="/register">Rekisteröidy</a> &nbsp;-&nbsp;
+            <a href="/login">Kirjaudu sisään</a>
+        {% endif %}
+        <br>
+        <a href="/">Uusimmat</a> &nbsp;-&nbsp;
+        <a href="/?sort=best">Parhaat</a> &nbsp;-&nbsp;
+        <a href="/?sort=worst">Huonoimmat</a> &nbsp;-&nbsp;
+        <a href="/add">Lisää</a> &nbsp;-&nbsp;
+        <a href="/stats">Infoa</a>
+        <br>
+        {% if request.path == '/' %}
+            <a onclick="to_top()">Ylös</a> &nbsp;-&nbsp;
+            <a onclick="to_bottom()">Alas</a> &nbsp;-&nbsp;
+            <a onclick="to_random()">Jonnekin</a>
+        {% else %}
+            <a href="/">Takaisin</a>
+        {% endif %}
+    </div>
     {% block body %}{% endblock %}
     <div class="footer">
         Tämän sivun generointi kesti __EXECUTION_TIME__.

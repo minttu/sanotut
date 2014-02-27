@@ -1,12 +1,11 @@
 {% extends "template.html" %}
 {% block body %}
-    <a href="/">Takaisin</a><br>
-    <br>
 
     {% include "about_to_add.html" %}
 
     <form method="POST">
         <textarea name="sanottu"></textarea><br>
-        <input type="submit" value="Jos luit ylempänä olevat muistutukset ja silti haluat lisätä sanotun, paina tästä">
+        <input class="wide" type="submit" value="Luin säännöt ja haluan lisätä">
     </form>
+
 {% endblock %}

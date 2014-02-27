@@ -1,0 +1,9 @@
+{% extends "template.html" %}
+{% block body %}
+
+    <span>Sanottuja on <span class="statnum">{{ data.posts }}</span> kappaletta.</span><br>
+    <span>Ääniä on annettu <span class="statnum">{{ data.votes }}</span> kertaa.</span><br>
+    <span>Äänien summa on <span class="statnum">{{ data.diff }}</span>.</span><br>
+    <span>Käyttäjiä on rekisteröitynyt <span class="statnum">{{ data.users }}</span> kappaletta.</span><br>
+
+{% endblock %}
