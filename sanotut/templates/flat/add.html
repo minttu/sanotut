@@ -1,0 +1,11 @@
+{% extends "flat/template.html" %}
+{% block body %}
+
+    {% include "flat/about_to_add.html" %}
+
+    <form method="POST">
+        <textarea name="sanottu"></textarea><br><br>
+        <button type="submit"  class="pure-button pure-button-primary">Luettuani säännöt haluan yhä lisätä sanotun</button>
+    </form>
+
+{% endblock %}

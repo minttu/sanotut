@@ -1,0 +1,31 @@
+{% extends "flat/template.html" %}
+{% block body %}
+    <div class="entries" id="entries">
+    {% for entry in entries %}
+        <div class="entry" id="E{{ entry[0] }}">
+            <div class="entryleft">
+                <span   class="button upvote {{ 'voted' if hasvoted(entry[0], voted, 1) else ''}}"
+                        title="Äänestä +"></span><br>
+                <span   class="points {{ 'upvoted'   if hasvoted(entry[0], voted,  1) else ''}}
+                                      {{ 'downvoted' if hasvoted(entry[0], voted, -1) else ''}} ">
+                                      {{ entry[4] }}</span><br>
+                <span   class="button downvote {{ 'voted' if hasvoted(entry[0], voted, -1) else ''}}"
+                        title="Äänestä -"></span>
+            </div>
+            <div class="entryright">
+                {% if entry[1] %}
+                    <span class="time">{{ entry[1].strftime('%d.%m.%Y') }}</span>
+                {% endif %}
+                {% if entry[4] <= -5 and not nohide %}
+                    <br><button class="show pure-button">Hidden because of low score. Show.</button>
+                {% endif %}
+                <pre class="{{ 'hidden' if entry[4] <= -5 and not nohide else '' }}">{{ entry[2]|safe }}</pre>
+            </div>
+        </div>
+    {% else %}
+        <pre>No entries</pre>
+    {% endfor %}
+    </div>
+    <script type="text/javascript" src="/static/minified.js"></script>
+    <script type="text/javascript" src="/static/sanotut-flat.js"></script>
+{% endblock %}

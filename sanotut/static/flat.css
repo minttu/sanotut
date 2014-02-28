@@ -1,0 +1,101 @@
+.world {
+    width: 960px;
+    margin: 2em auto 0;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 2em;
+}
+
+footer {
+    font-size: .8em;
+    text-align: right;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2em;
+    width: calc(100% - 1em);
+}
+
+.entry {
+    margin-bottom: 1em;
+    min-height: 4em;
+    width: 100%;
+}
+
+.entryleft {
+    float: left;
+    text-align: center;
+    display: inline-block;
+    width: 2em;
+    padding-top: .5em;
+    color: #c6c6c6;
+}
+
+.entryright {
+    display: inline-block;
+}
+
+.upvote, .downvote {
+    font-size: 1.25em;
+}
+
+.upvote:before {
+    content: '▲';
+}
+
+.downvote:before {
+    content: '▼'
+}
+
+.upvote.voted, .upvoted {
+    color: #FF8B60;
+}
+
+.downvote.voted, .downvoted {
+    color: #9494FF;
+}
+
+.button {
+    cursor: pointer;
+}
+
+.time {
+    font-style: italic;
+}
+
+.points {
+    font-weight: bold;
+}
+
+.hidden {
+    display: none;
+}
+
+.right {
+    float: right;
+}
+
+.right:after {
+    clear: both;
+}
+
+.mono {
+    font-family: monospace;
+}
+
+pre {
+    margin-top: 1em;
+    max-width: calc(960px - 36px);
+}
+
+textarea {
+    resize: none;
+    width: 100%;
+    height: 320px;
+}

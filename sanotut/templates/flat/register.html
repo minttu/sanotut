@@ -1,0 +1,20 @@
+{% extends "flat/template.html" %}
+{% block body %}
+
+    <p>Pääset äänestämään sanottuja vain jos rekisteröidyt.</p>
+
+    <form method="POST" class="pure-form pure-form-stacked">
+        <fieldset>
+
+            <label for="email">Muotoa nick@paivola.fi (Ei etunimi.sukunimi@paivola.fi)</label>
+            <input type="text" placeholder="email" id="email" name="email">
+
+            <label for="password">Yli viisi merkkiä. Käytäthän eri salasanaa kuin shellillä!</label>
+            <input type="password" placeholder="password" id="password" name="password">
+
+            <button type="submit" class="pure-button pure-button-primary">Rekisteröi</button>
+
+        </fieldset>
+    </form>
+
+{% endblock %}

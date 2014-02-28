@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Sanotut</title>
+    <link rel="stylesheet" type="text/css" href="/static/pure-min.css">
+    <link rel="stylesheet" type="text/css" href="/static/flat.css">
+    <link rel="shortcut icon" href="/static/favicon.ico">
+</head>
+<body>
+    <div class="pure-menu pure-menu-open pure-menu-horizontal">
+
+        <ul style="width: 100%">
+            <li class="{{ 'pure-menu-selected' if name == 'new' else '' }}" ><a href="/">Uusimmat</a></li>
+            <li class="{{ 'pure-menu-selected' if name == 'best' else '' }}" ><a href="/?sort=best">Parhaat</a></li>
+            <li class="{{ 'pure-menu-selected' if name == 'worst' else '' }}" ><a href="/?sort=worst">Huonoimmat</a></li>
+            <li class="{{ 'pure-menu-selected' if name == 'add' else '' }}" ><a href="/add">Lisää</a></li>
+            <li class="{{ 'pure-menu-selected' if name == 'stats' else '' }}" ><a href="/stats">Infoa</a></li>
+            {% if not session["logged_in"] %}
+                <li class="right {{ 'pure-menu-selected' if name == 'register' else '' }}" ><a href="/register">Rekisteröidy</a></li>
+                <li class="right {{ 'pure-menu-selected' if name == 'login' else '' }}" ><a href="/login">Kirjaudu</a></li>
+            {% else %}
+                <li class="right"><a href="/logout">Kirjaudu ulos</a></li>
+                <li class="right"><a>{{ session["email"] }}</a></li>
+            {% endif %}
+        </ul>
+
+    </div>
+
+    <div class="world">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <span class="flash">{{ message }}</span><br>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block body %}{% endblock %}
+        <div class="push"></div>
+    </div>
+
+    <footer>
+        Ongelmia? Potki <code>Juhani@PVLNet</code>.
+        Tämän sivun generointi kesti __EXECUTION_TIME__.
+    </footer>
+</body>
+</html>

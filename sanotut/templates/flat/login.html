@@ -1,0 +1,17 @@
+{% extends "flat/template.html" %}
+{% block body %}
+
+    <p>Pääset äänestämään sanottuja vain jos kirjaudut sisään.</p>
+
+    <form method="POST" class="pure-form">
+        <fieldset>
+
+            <input type="email" name="email" placeholder="Email">
+            <input type="password" name="password" placeholder="Password">
+
+            <button type="submit" class="pure-button pure-button-primary">Kirjaudu</button>
+
+        </fieldset>
+    </form>
+
+{% endblock %}

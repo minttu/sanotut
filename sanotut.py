@@ -74,6 +74,11 @@ def checklogout():
             del session["logged_in"]
 
 
+def render(template, **kwargs):
+    style = session["style"] if "style" in session else "classic"
+    return render_template(style + "/" + template, **kwargs)
+
+
 @app.route('/')
 def route_index():
     checklogout()
@@ -83,6 +88,7 @@ def route_index():
     elif sort == "worst":
         c.execute("SELECT * FROM sanotut ORDER BY points ASC")
     else:
+        sort = "new"
         c.execute("SELECT * FROM sanotut ORDER BY id DESC")
     entries = c.fetchall()
     uid = checksesval()
@@ -90,10 +96,11 @@ def route_index():
     if uid != None:
         c.execute("SELECT * FROM sanotut_votes WHERE user_id=(%s)", (uid,))
         voted = [(row[3], row[4]) for row in c.fetchall()]
-    return render_template("index.html",
-                           entries=entries,
-                           voted=voted,
-                           nohide=(True if sort == "worst" else False))
+    return render("index.html",
+                  entries=entries,
+                  voted=voted,
+                  nohide=(True if sort == "worst" else False),
+                  name=sort)
 
 
 @app.route('/add', methods=['GET', 'POST'])
@@ -111,7 +118,7 @@ def route_add():
                    datetime.datetime.now()))
         db.commit()
         return redirect("/")
-    return render_template("add.html")
+    return render("add.html", name="add")
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -138,8 +145,8 @@ def route_register():
         db.commit()
 
         flash(u"Voit nyt kirjautua sisään!")
-        return redirect("/login")
-    return render_template("register.html")
+        return redirect("/login", name="login")
+    return render("register.html", name="register")
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -169,7 +176,7 @@ def route_login():
 
         flash(u"Kirjauduit sisään.")
         return redirect("/")
-    return render_template("login.html")
+    return render("login.html", name="login")
 
 
 @app.route('/logout')
@@ -251,7 +258,13 @@ def route_stats():
     data["diff"] = 0
     for i in arr:
         data["diff"] += i[4]
-    return render_template("stats.html", data=data)
+    return render("stats.html", data=data, name="stats")
+
+
+@app.route('/style/<string:name>')
+def route_style(name):
+    session["style"] = name
+    return redirect("/")
 
 
 @app.before_request
@@ -278,6 +291,7 @@ def utility_processor():
             if val == i[0] and diff == i[1]:
                 return True
         return False
+
     return dict(hasvoted=hasvoted)
 
 if __name__ == "__main__":
