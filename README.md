@@ -1,4 +1,4 @@
-sanotut
+sanotut.py
 ==========
 
 Database for quotes. Beta quality. Flat theme is not ready for production!
@@ -13,6 +13,7 @@ TODO
 install
 =======
 
+    create a config.py with user, host, database, password, secret, (boolean) realaccouts
     virtualenv venv
     ./venv/bin/pip install -r requirements.txt
     setup some rerouting
