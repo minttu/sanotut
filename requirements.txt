@@ -1,0 +1,10 @@
+Flask==0.10.1
+Jinja2==2.7.2
+MarkupSafe==0.18
+Werkzeug==0.9.4
+argparse==1.1
+itsdangerous==0.23
+mysql-connector-repackaged==0.3.1
+passlib==1.6.2
+six==1.5.2
+wsgiref==0.1.2
