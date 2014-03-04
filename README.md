@@ -1,7 +1,7 @@
 sanotut
 ==========
 
-Database for quotes. Beta quality.
+Database for quotes. Beta quality. Flat theme is not ready for production!
 
 TODO
 ====
