@@ -6,6 +6,10 @@ sys.dont_write_bytecode = True
 import os
 import config
 import mysql.connector
+import string
+import random
+from passlib.apps import custom_app_context as pwd_context
+
 db = mysql.connector.connect(password=config.password,
                              user=config.user,
                              host=config.host,
@@ -22,12 +26,27 @@ def main():
         count()
     elif "usercount" in sys.argv:
         usercount()
+    elif "passwd" in sys.argv:
+        passwd()
     else:
         print "./manage.py <command>"
         print ""
         print "  initdb          initialize MySQL"
         print "  count           find anomalies in votes"
         print "  usercount       list users"
+        print "  passwd          set password"
+
+
+def passwd():
+    uid = input("User ID: ")
+    allchoice = string.lowercase + string.uppercase + string.digits
+    new = ''.join(random.choice(allchoice) for i in range(12))
+    print "Setting user id %s password to %s" % (uid, new)
+    hash = pwd_context.encrypt(new)
+    res = c.execute("UPDATE sanotut_users SET password = (%s) WHERE id = (%s)",
+                    (hash, uid))
+    print res
+    db.commit()
 
 
 def count():

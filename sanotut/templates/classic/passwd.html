@@ -1,0 +1,12 @@
+{% extends "classic/template.html" %}
+{% block body %}
+
+    <p>Vaihda salasanasi parempaan</p>
+
+    <form method="POST">
+        <input type="password" placeholder="vanha" id="old" name="old"><br>
+        <input type="password" placeholder="uusi" id="new" name="new"><br>
+        <input type="submit" value="Vaihda salasanani">
+    </form>
+
+{% endblock %}

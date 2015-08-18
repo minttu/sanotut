@@ -21,6 +21,7 @@
         {% endwith %}
         {% if session["logged_in"] %}
             <span class="logged_in">Olet kirjautuneena sisään {{ session["email"] }}</span>
+            <a href="/passwd">Vaihda salasana</a> &nbsp;-&nbsp;
             <a href="/logout">Kirjaudu ulos</a>
         {% else %}
             <a href="/register">Rekisteröidy</a> &nbsp;-&nbsp;

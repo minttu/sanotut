@@ -179,6 +179,35 @@ def route_login():
     return render("login.html", name="login")
 
 
+@app.route('/passwd', methods=['GET', 'POST'])
+def route_passwd():
+    checklogout()
+
+    uid = checksesval()
+    if uid is None:
+        return u"error: et ole kirjautunut sisään", 400
+
+    if request.method == 'POST':
+        if "new" not in request.form or len(request.form["new"]) < 6:
+            flash(u"Uusi salasana ei täyttänyt vaatimuksia")
+            return redirect("/passwd")
+        c.execute(("SELECT * FROM sanotut_users "
+                   "WHERE email = (%s)"),
+                 (session["email"],))
+        res = c.fetchone()
+        if res == None or not pwd_context.verify(request.form.get("old", ""), res[2]):
+            flash(u"Vanha salasana väärin")
+            return redirect("/passwd")
+
+        c.execute("UPDATE sanotut_users SET password = (%s) WHERE id = (%s)",
+                  (pwd_context.encrypt(request.form["new"]), uid))
+        db.commit()
+
+        flash(u"Salasana vaihdettu.")
+        return redirect("/")
+    return render("passwd.html")
+
+
 @app.route('/logout')
 def route_logout():
     uid = checksesval()
